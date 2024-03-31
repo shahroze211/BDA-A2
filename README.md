@@ -44,12 +44,18 @@ Run the Code: Execute the main Python script (search_engine.py or any other rele
 Interact with the Search Engine: Input queries through the command line interface, and the search engine will process the queries and return the most relevant documents based on TF-IDF and cosine similarity.
 
 Code Structure
-search_engine.py: Main Python script containing the implementation of the search engine.
-data/sample.csv: Sample CSV file used for testing the search engine.
+BDA_A2.py: Main Python script containing the implementation of the search engine.
+sample.csv: Sample CSV file used for testing the search engine.
 README.md: README file providing an overview of the search engine and instructions for usage.
+mapper.py: Mapper file for Apache Hadoop, converted from the original code implemented in the IPython Notebook.
+reducer.py: Reducer file for Apache Hadoop, converted from the original code implemented in the IPython Notebook.
 Acknowledgments
-The search engine implementation uses concepts from information retrieval and natural language processing.
-NLTK and scikit-learn libraries are used for text preprocessing and cosine similarity calculation, respectively.
+The search engine implementation uses concepts from information retrieval and natural language processing. NLTK and scikit-learn libraries are used for text preprocessing and cosine similarity calculation, respectively. Additionally, the IPython Notebook code was converted into mapper and reducer files for Apache Hadoop to enable distributed processing of large datasets.
+
+
+
+
+
 
 
 *Cluster*
