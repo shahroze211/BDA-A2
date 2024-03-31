@@ -1,4 +1,9 @@
+# MapReduce Assignment
 
+## Team Members
+- Shahroze Naveed (Roll No: 22i-1922)
+- Hamza Sabih (Roll No: 22i-1948)
+- Taha Rasheed (Roll No: 22i-2009)
 
 
 Search Engine README
