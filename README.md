@@ -49,6 +49,7 @@ sample.csv: Sample CSV file used for testing the search engine.
 README.md: README file providing an overview of the search engine and instructions for usage.
 mapper.py: Mapper file for Apache Hadoop, converted from the original code implemented in the IPython Notebook.
 reducer.py: Reducer file for Apache Hadoop, converted from the original code implemented in the IPython Notebook.
+A2.Zip: It contains the Mapper and reducer files .
 Acknowledgments
 The search engine implementation uses concepts from information retrieval and natural language processing. NLTK and scikit-learn libraries are used for text preprocessing and cosine similarity calculation, respectively. Additionally, the IPython Notebook code was converted into mapper and reducer files for Apache Hadoop to enable distributed processing of large datasets.
 
