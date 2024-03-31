@@ -1,5 +1,5 @@
 
-Sure, here's a detailed README file based on the provided code:
+
 
 Search Engine README
 This repository contains the implementation of a basic search engine using Python. The search engine is capable of indexing documents, calculating TF-IDF (Term Frequency-Inverse Document Frequency) representations, and processing user queries to retrieve the most relevant documents.
@@ -21,12 +21,11 @@ NLTK (Natural Language Toolkit) library
 scikit-learn library (for cosine similarity calculation)
 You can install NLTK and scikit-learn using pip:
 
-Copy code
+
 pip install nltk scikit-learn
 Before running the code, you also need to download the NLTK stopwords dataset. You can do this by running the following Python code once:
 
-python
-Copy code
+
 import nltk
 nltk.download('punkt')
 nltk.download('stopwords')
