@@ -1,0 +1,254 @@
+import nltk
+nltk.download('punkt')
+
+from collections import defaultdict
+from nltk.tokenize import word_tokenize  # Assuming NLTK for tokenization
+
+def tokenize(text):
+    """Tokenizes text into lowercase words, removing punctuation."""
+    return [word.lower() for word in word_tokenize(text) if word.isalnum()]
+
+def create_vocabulary_and_tf(data_path):
+    """
+    Reads data from a CSV file, creates vocabulary, and calculates TF for each document.
+
+    Args:
+        data_path (str): Path to the CSV file containing text data.
+
+    Returns:
+        tuple: (vocabulary, tf_representations)
+            - vocabulary (dict): Maps terms to unique IDs.
+            - tf_representations (list): List of dictionaries representing TF for each document.
+    """
+
+    vocabulary = defaultdict(int)  # Track term counts for vocabulary creation
+    tf_representations = []
+
+    # Read data from CSV file
+    with open(data_path, 'r') as f:
+        next(f)  # Skip header row
+        for line in f:
+            parts = line.strip().split(',')  # Split each line based on commas
+            # Check if the line has enough parts
+            if len(parts) < 4:
+                continue  # Skip this line if it doesn't have enough parts
+
+            # Extract text content from the desired column (e.g., SECTION_TEXT)
+            text = parts[3]
+
+            # Tokenize text and create TF representation for the document
+            document_tf = {}
+            for term in tokenize(text):
+                term_id = vocabulary.get(term)  # Get existing ID or create new one
+                if not term_id:
+                    term_id = len(vocabulary)
+                    vocabulary[term] = term_id
+                document_tf[term_id] = document_tf.get(term_id, 0) + 1  # Count term frequency
+
+            tf_representations.append(document_tf)
+
+    return vocabulary, tf_representations
+
+
+# File path to the CSV file
+sample_file_path = "sample.csv"
+
+# Call the function with the file path
+vocabulary, tf_representations = create_vocabulary_and_tf(sample_file_path)
+
+# Display the first 20 elements of the vocabulary
+print("First 20 terms in the Vocabulary:")
+for term, term_id in list(vocabulary.items())[:20]:
+    print(f"Term: {term}, ID: {term_id}")
+
+# Display the first 20 sample TF representations
+print("\nSample TF representations (First 20 documents):")
+for i, tf_representation in enumerate(tf_representations[:20], start=1):
+    print(f"Document {i}:", tf_representation)
+
+import math
+
+def create_vocabulary_and_tf(data_path):
+    """
+    Reads data from a CSV file, creates vocabulary, calculates TF for each document,
+    and computes IDF for each term.
+
+    Args:
+        data_path (str): Path to the CSV file containing text data.
+
+    Returns:
+        tuple: (vocabulary, tf_representations, idf_values)
+            - vocabulary (dict): Maps terms to unique IDs.
+            - tf_representations (list): List of dictionaries representing TF for each document.
+            - idf_values (dict): IDF values for each term in the vocabulary.
+    """
+
+    vocabulary = defaultdict(int)  # Track term counts for vocabulary creation
+    tf_representations = []
+    document_count = 0
+    idf_values = {}
+
+    # Read data from CSV file
+    with open(data_path, 'r') as f:
+        next(f)  # Skip header row
+        for line in f:
+            parts = line.strip().split(',')  # Split each line based on commas
+            # Check if the line has enough parts
+            if len(parts) < 4:
+                continue  # Skip this line if it doesn't have enough parts
+
+            # Extract text content from the desired column (e.g., SECTION_TEXT)
+            text = parts[3]
+
+            # Tokenize text and create TF representation for the document
+            document_tf = {}
+            for term in tokenize(text):
+                term_id = vocabulary.get(term)  # Get existing ID or create new one
+                if not term_id:
+                    term_id = len(vocabulary)
+                    vocabulary[term] = term_id
+                    idf_values[term_id] = 0  # Initialize IDF value for new term
+                document_tf[term_id] = document_tf.get(term_id, 0) + 1  # Count term frequency
+
+            tf_representations.append(document_tf)
+            document_count += 1
+
+    # Calculate IDF for each term
+    for term_id in idf_values:
+        df = sum(1 for doc_tf in tf_representations if term_id in doc_tf)
+        idf_values[term_id] = math.log(document_count / (df + 1))
+
+    return vocabulary, tf_representations, idf_values
+
+# File path to the CSV file
+sample_file_path = "sample.csv"
+
+# Call the function with the file path
+vocabulary, tf_representations, idf_values = create_vocabulary_and_tf(sample_file_path)
+
+# Display the first 20 elements of the vocabulary IDF values
+print("First 20 terms in the Vocabulary and their IDF values:")
+count = 0
+for term, idf in idf_values.items():
+    print(f"{term}: {idf}")
+    count += 1
+    if count == 20:
+        break
+
+print("\nSample TF representations (First 20 documents):")
+for i, doc_tf in enumerate(tf_representations[:20], start=1):
+    print(f"Document {i}: {doc_tf}")
+
+def calculate_tf_idf(tf_representations, idf_values):
+    """
+    Calculates TF-IDF weights for each term in each document.
+
+    Args:
+        tf_representations (list): List of dictionaries representing TF for each document.
+        idf_values (dict): Dictionary containing IDF values for each term in the vocabulary.
+
+    Returns:
+        list: List of dictionaries representing TF-IDF weights for each term in each document.
+    """
+    tf_idf_weights = []
+
+    for document_tf in tf_representations:
+        document_tf_idf = {}
+        for term_id, tf in document_tf.items():
+            idf = idf_values.get(term_id, 0.0)  # Get IDF value for the term
+            tf_idf = tf * idf  # Calculate TF-IDF weight
+            document_tf_idf[term_id] = tf_idf
+        tf_idf_weights.append(document_tf_idf)
+
+    return tf_idf_weights
+
+# Calculate TF-IDF weights
+tf_idf_weights = calculate_tf_idf(tf_representations, idf_values)
+
+# Display the TF-IDF weights for the first 20 documents
+for i, document_weights in enumerate(tf_idf_weights[:20], start=1):
+    print(f"Document {i} TF-IDF weights:")
+    for term_id, weight in document_weights.items():
+        print(f"Term ID: {term_id}, TF-IDF Weight: {weight}")
+
+import numpy as np
+
+def tf_idf_to_vector(tf_idf_weights, vocabulary_size):
+    """
+    Transform TF-IDF representations into vector form for both documents and queries.
+
+    Args:
+        tf_idf_weights (list): List of dictionaries representing TF-IDF weights for each term in each document.
+        vocabulary_size (int): Size of the vocabulary.
+
+    Returns:
+        numpy.ndarray: 2D array where each row represents a document or query as a vector of TF-IDF weights.
+    """
+    vectors = []
+    for document_weights in tf_idf_weights:
+        vector = np.zeros(vocabulary_size)
+        for term_id, weight in document_weights.items():
+            vector[term_id] = weight
+        vectors.append(vector)
+    return np.array(vectors)
+
+# Determine the size of the vocabulary
+vocabulary_size = len(vocabulary)
+
+# Convert TF-IDF representations to vectors
+document_vectors = tf_idf_to_vector(tf_idf_weights, vocabulary_size)
+
+# Display the vectors for the first 20 documents
+for i, vector in enumerate(document_vectors[:20], start=1):
+    print(f"Document {i} vector representation:")
+    print(vector)
+
+import nltk
+nltk.download('stopwords')
+
+from sklearn.metrics.pairwise import cosine_similarity
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+import numpy as np
+
+# Tokenization and preprocessing
+stop_words = set(stopwords.words('english'))
+stemmer = PorterStemmer()
+
+def preprocess(text):
+    tokens = word_tokenize(text.lower())
+    tokens = [stemmer.stem(token) for token in tokens if token.isalnum() and token not in stop_words]
+    return ' '.join(tokens)
+
+def calculate_query_tfidf(query, vocabulary, idf_values):
+    query_terms = preprocess(query)
+    query_tfidf = np.zeros(len(vocabulary))
+    for term in query_terms:
+        term_id = vocabulary.get(term)
+        if term_id is not None:
+            query_tfidf[term_id] = idf_values[term_id]
+    return query_tfidf
+
+def rank_documents(query_tfidf, document_vectors):
+    similarity_scores = cosine_similarity([query_tfidf], document_vectors)
+    ranked_indices = np.argsort(similarity_scores, axis=1)[0][::-1]  # Descending order
+    return ranked_indices
+
+# Assuming you have already loaded vocabulary, idf_values, and document_vectors
+
+# Example query input
+query = input("Enter your query: ")
+
+# Calculate TF-IDF representation for the query
+query_tfidf = calculate_query_tfidf(query, vocabulary, idf_values)
+
+# Rank documents based on cosine similarity
+ranked_indices = rank_documents(query_tfidf, document_vectors)
+
+# Print the top 20 ranked documents
+print("Search Results:")
+for i, idx in enumerate(ranked_indices[:20], start=1):
+    print(f"Rank {i}: Document {idx + 1}")
+
+
